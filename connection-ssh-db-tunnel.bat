@@ -1,0 +1,1 @@
+plink -i "G:\OBSIDIAN DO NOT DELETE\Archive\cash-app-key-pair.ppk" -L 15432:database-apex.czoc4gse0qtr.eu-north-1.rds.amazonaws.com:5432 ubuntu@ec2-16-171-44-179.eu-north-1.compute.amazonaws.com -N
