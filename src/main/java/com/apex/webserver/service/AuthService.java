@@ -89,19 +89,13 @@ public class AuthService {
         // Add cookie to response
         response.addCookie(refreshTokenCookie);
 
-        // Get user roles
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
+        // Get user roles directly from entity (clean names)
+        List<String> roles = user.getRoles().stream()
+                .map(Role::getName)
                 .collect(Collectors.toList());
 
         // Return JWT response with access token
-        return new JwtResponseDto(
-                accessToken,
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                roles
-        );
+        return new JwtResponseDto(accessToken, user, roles);
     }
 
     @Transactional

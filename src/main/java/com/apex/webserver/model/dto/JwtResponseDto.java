@@ -4,21 +4,32 @@ import java.util.List;
 
 public class JwtResponseDto {
     private String accessToken;
-    private Long id;
-    private String username;
-    private String email;
-    private List<String> roles;
+    private UserDto user;
 
     // Constructors
     public JwtResponseDto() {
     }
 
+    public JwtResponseDto(String accessToken, UserDto user) {
+        this.accessToken = accessToken;
+        this.user = user;
+    }
+
+    // Convenience constructor using User entity
+    public JwtResponseDto(String accessToken, com.apex.webserver.model.entity.User user, List<String> roles) {
+        this.accessToken = accessToken;
+        this.user = new UserDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                roles
+        );
+    }
+
+    // Backward compatibility constructor
     public JwtResponseDto(String accessToken, Long id, String username, String email, List<String> roles) {
         this.accessToken = accessToken;
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.roles = roles;
+        this.user = new UserDto(id, username, email, roles);
     }
 
     // Getters and setters
@@ -30,35 +41,12 @@ public class JwtResponseDto {
         this.accessToken = accessToken;
     }
 
-    public Long getId() {
-        return id;
+    public UserDto getUser() {
+        return user;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUser(UserDto user) {
+        this.user = user;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
-    }
 }
