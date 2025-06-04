@@ -1,0 +1,3 @@
+@echo off
+echo Running JAR without running tests...
+call mvnw spring-boot:run "-Dspring-boot.run.profiles=dev"

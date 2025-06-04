@@ -129,7 +129,7 @@ public class AuthService {
         // Assign default USER role
         Set<Role> roles = new HashSet<>();
         Role userRole = roleRepository.findByName("USER")
-                .orElseThrow(() -> new RuntimeException("Default role not found"));
+                .orElseThrow(() -> new RuntimeException("Default role not found")); // TODO: Handle default role not found with a proper exception
         roles.add(userRole);
         user.setRoles(roles);
 
@@ -166,7 +166,8 @@ public class AuthService {
                                 .withUsername(user.getUsername())
                                 .password(user.getPasswordHash())
                                 .authorities(user.getRoles().stream()
-                                        .map(role -> new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + role.getName()))
+                                        // It was ROLE_ here previously
+                                        .map(role -> new org.springframework.security.core.authority.SimpleGrantedAuthority(role.getName()))
                                         .collect(Collectors.toList()))
                                 .build())
                         .orElseThrow(() -> new RuntimeException("User not found"));

@@ -16,11 +16,12 @@ public class WebConfig implements WebMvcConfigurer {
         CorsConfiguration config = new CorsConfiguration();
 
         // Allow specific origins instead of "*"
-        config.addAllowedOriginPattern("*"); // This is more permissive but works with credentials
+        // config.addAllowedOriginPattern("*"); // This is more permissive but works with credentials
 
         // Or specify exact origins:
-        // config.addAllowedOrigin("http://localhost:3000");
-        // config.addAllowedOrigin("https://yourdomain.com");
+         config.addAllowedOrigin("http://localhost");
+         config.addAllowedOrigin("http://134.249.68.42");
+         config.addAllowedOrigin("https://yourdomain.com");
 
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");

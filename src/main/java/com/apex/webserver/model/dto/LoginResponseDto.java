@@ -1,19 +1,19 @@
 package com.apex.webserver.model.dto;
 
 public class LoginResponseDto {
-    private String access_token;
-    private String token_type;
-    private int expires_in;
+    private final String accessToken;
+    private final String tokenType;
+    private final int expiresIn;
 
     // Constructor, getters, setters
     public LoginResponseDto(String accessToken, String tokenType, int expiresIn) {
-        this.access_token = accessToken;
-        this.token_type = tokenType;
-        this.expires_in = expiresIn;
+        this.accessToken = accessToken;
+        this.tokenType = tokenType;
+        this.expiresIn = expiresIn;
     }
 
     // Getters
-    public String getAccess_token() { return access_token; }
-    public String getToken_type() { return token_type; }
-    public int getExpires_in() { return expires_in; }
+    public String getAccessToken() { return accessToken; }
+    public String getTokenType() { return tokenType; }
+    public int getExpiresIn() { return expiresIn; }
 }

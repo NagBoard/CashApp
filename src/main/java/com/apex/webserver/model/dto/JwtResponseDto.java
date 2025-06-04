@@ -4,7 +4,6 @@ import java.util.List;
 
 public class JwtResponseDto {
     private String accessToken;
-    private String type = "Bearer";
     private Long id;
     private String username;
     private String email;
@@ -29,14 +28,6 @@ public class JwtResponseDto {
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public Long getId() {

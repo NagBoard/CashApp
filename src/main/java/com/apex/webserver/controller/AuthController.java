@@ -17,7 +17,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
-// Remove the CrossOrigin annotation - we'll handle this in WebConfig
 public class AuthController {
 
     private final AuthService authService;
