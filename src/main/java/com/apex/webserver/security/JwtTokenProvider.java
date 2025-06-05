@@ -65,7 +65,7 @@ public class JwtTokenProvider {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(userDetails.getUsername()) // This is actually the email from UserDetails
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .setIssuer(issuer)
@@ -76,8 +76,8 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         Claims claims = extractAllClaims(token);
 
-        // Extract username
-        String username = claims.getSubject();
+        // Extract email (stored in the subject claim)
+        String email = claims.getSubject();
 
         // Extract roles
         List<Map<String, String>> roles = (List<Map<String, String>>) claims.get("roles", List.class);
@@ -89,8 +89,9 @@ public class JwtTokenProvider {
                     .collect(Collectors.toList());
         }
 
+        // Create principal using email as the username parameter
         UserDetails principal = org.springframework.security.core.userdetails.User
-                .withUsername(username)
+                .withUsername(email)  // This is actually the email
                 .password("") // Not needed for token authentication
                 .authorities(authorities)
                 .build();

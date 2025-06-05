@@ -14,9 +14,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String username;
-
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
@@ -49,7 +46,8 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    // THIS is where we get the roles
+
+    // THIS is where we get the roles as a hashset, but actual fetching will happen in AuthService
     private Set<Role> roles = new HashSet<>();
 
     @PrePersist
@@ -67,9 +65,9 @@ public class User {
     public User() {
     }
 
-    public User(String username, String passwordHash, Boolean isActive,
+    public User(String email, String passwordHash, Boolean isActive,
                 LocalDateTime createdAt) {
-        this.username = username;
+        this.email = email;
         this.passwordHash = passwordHash;
         this.isActive = isActive;
         this.createdAt = createdAt;
@@ -83,14 +81,6 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPasswordHash() {
@@ -168,7 +158,9 @@ public class User {
     // equals and hashCode
 
     /**
-    * Overwrites the queals method for User objects to compare themselves via username and email
+    * Overwrites the equals method for User objects to compare themselves via id and email
+     * @param o object to compare to
+     * @return true if id and email are the same, false otherwise
     * */
     @Override
     public boolean equals(Object o) {
@@ -180,7 +172,8 @@ public class User {
     }
 
     /**
-     * Overwrites the hashCode method for User objects to represent same critera as queals method
+     * Overwrites the hashCode method for User objects to represent the same criteria as equals method
+     * @return hashCode of id and email combined as a single integer value, used for comparing User objects in hash tables
      * */
     @Override
     public int hashCode() {
@@ -189,12 +182,12 @@ public class User {
 
     /**
      * Overwrites the toString method for User objects to turn User object into strings represenful of the class
+     * @return this User credentials in a string
      * */
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +

@@ -20,16 +20,15 @@ public class JwtResponseDto {
         this.accessToken = accessToken;
         this.user = new UserDto(
                 user.getId(),
-                user.getUsername(),
                 user.getEmail(),
                 roles
         );
     }
 
     // Backward compatibility constructor
-    public JwtResponseDto(String accessToken, Long id, String username, String email, List<String> roles) {
+    public JwtResponseDto(String accessToken, Long id, String email, List<String> roles) {
         this.accessToken = accessToken;
-        this.user = new UserDto(id, username, email, roles);
+        this.user = new UserDto(id, email, roles);
     }
 
     // Getters and setters

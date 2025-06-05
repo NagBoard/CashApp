@@ -5,16 +5,14 @@ import java.util.List;
 // Nested UserDto class
 public class UserDto {
     private Long id;
-    private String username;
     private String email;
     private List<String> roles;
 
     public UserDto() {
     }
 
-    public UserDto(Long id, String username, String email, List<String> roles) {
+    public UserDto(Long id, String email, List<String> roles) {
         this.id = id;
-        this.username = username;
         this.email = email;
         this.roles = roles;
     }
@@ -28,13 +26,6 @@ public class UserDto {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
     public String getEmail() {
         return email;

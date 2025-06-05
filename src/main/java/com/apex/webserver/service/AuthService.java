@@ -9,14 +9,15 @@ import com.apex.webserver.model.dto.TokenDto;
 import com.apex.webserver.repository.RoleRepository;
 import com.apex.webserver.repository.UserRepository;
 import com.apex.webserver.security.JwtTokenProvider;
+import com.apex.webserver.security.UserDetailsService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,8 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
+    private final UserDetailsService userDetailsService;
+
 
     @Value("${jwt.refresh-token.cookie-name}")
     private String refreshTokenCookieName;
@@ -41,24 +44,27 @@ public class AuthService {
     @Value("${jwt.refresh-token.expiration}")
     private long refreshTokenExpiration;
 
+    // Inject dependencies
     public AuthService(
             AuthenticationManager authenticationManager,
             UserRepository userRepository,
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,
-            JwtTokenProvider tokenProvider) {
+            JwtTokenProvider tokenProvider,
+            UserDetailsService userDetailsService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
+        this.userDetailsService = userDetailsService;
     }
 
     public JwtResponseDto authenticateUser(LoginRequestDto loginRequest, HttpServletResponse response) {
         // Authenticate user
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
+                        loginRequest.getEmail(),
                         loginRequest.getPassword()
                 )
         );
@@ -67,10 +73,10 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Get user details
-        org.springframework.security.core.userdetails.UserDetails userDetails =
-                (org.springframework.security.core.userdetails.UserDetails) authentication.getPrincipal();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        User user = userRepository.findByUsername(userDetails.getUsername())
+        // Get user by email (if not found, throw exception), username is defined as email in my UserDetailsService
+        User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Generate access token (short-lived, returned in response)
@@ -100,10 +106,6 @@ public class AuthService {
 
     @Transactional
     public JwtResponseDto registerUser(RegisterRequestDto registerRequest, HttpServletResponse response) {
-        // Check if username exists
-        if (userRepository.existsByUsername(registerRequest.getUsername())) {
-            throw new RuntimeException("Username is already taken");
-        }
 
         // Check if email exists
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
@@ -112,7 +114,6 @@ public class AuthService {
 
         // Create new user
         User user = new User();
-        user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
         user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
         user.setFirstName(registerRequest.getFirstName());
@@ -132,7 +133,7 @@ public class AuthService {
 
         // Authenticate and generate token
         LoginRequestDto loginRequest = new LoginRequestDto(
-                registerRequest.getUsername(),
+                registerRequest.getEmail(),
                 registerRequest.getPassword()
         );
 
@@ -146,25 +147,14 @@ public class AuthService {
         }
 
         // Extract username from refresh token
-        String username = tokenProvider.extractUsername(refreshToken);
+        String email = tokenProvider.extractUsername(refreshToken);
 
         // Validate token
-        if (username == null) {
-            throw new RuntimeException("Invalid refresh token");
+        if (email == null) {
+            throw new RuntimeException("Invalid refresh token, email is missing");
         }
 
-        // Load user details
-        org.springframework.security.core.userdetails.UserDetails userDetails =
-                userRepository.findByUsername(username)
-                        .map(user -> org.springframework.security.core.userdetails.User
-                                .withUsername(user.getUsername())
-                                .password(user.getPasswordHash())
-                                .authorities(user.getRoles().stream()
-                                        // It was ROLE_ here previously
-                                        .map(role -> new org.springframework.security.core.authority.SimpleGrantedAuthority(role.getName()))
-                                        .collect(Collectors.toList()))
-                                .build())
-                        .orElseThrow(() -> new RuntimeException("User not found"));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
         // Validate refresh token
         if (!tokenProvider.isTokenValid(refreshToken, userDetails)) {

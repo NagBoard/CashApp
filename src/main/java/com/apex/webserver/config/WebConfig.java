@@ -1,3 +1,5 @@
+/*
+
 package com.apex.webserver.config;
 
 import org.springframework.context.annotation.Bean;
@@ -32,3 +34,5 @@ public class WebConfig implements WebMvcConfigurer {
         return new CorsFilter(source);
     }
 }
+
+ */
