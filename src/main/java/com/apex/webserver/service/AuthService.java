@@ -36,7 +36,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final UserDetailsService userDetailsService;
-
+    private final String TEMP_PASSWORD = ""
 
     @Value("${jwt.refresh-token.cookie-name}")
     private String refreshTokenCookieName;

@@ -2,7 +2,6 @@ package com.apex.webserver.model.dto;
 
 public class RegisterRequestDto {
     private String email;
-    private String password;
     private String firstName;
     private String lastName;
     private String phone;
@@ -11,9 +10,8 @@ public class RegisterRequestDto {
     public RegisterRequestDto() {
     }
 
-    public RegisterRequestDto(String email, String password) {
+    public RegisterRequestDto(String email) {
         this.email = email;
-        this.password = password;
     }
 
     // Getters and setters
@@ -23,14 +21,6 @@ public class RegisterRequestDto {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getFirstName() {

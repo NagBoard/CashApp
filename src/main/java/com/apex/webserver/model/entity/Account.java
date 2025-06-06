@@ -5,6 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import com.apex.webserver.model.enums.AccountType;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -13,9 +15,9 @@ import java.time.LocalDateTime;
 public class Account {
     @Id @GeneratedValue
     private Long id;
-
+    private Long code;
     private String name;
-    // private AccountType type;
+    private AccountType type;
     private String category;
     private BigDecimal balance;
     private LocalDateTime createdAt;
