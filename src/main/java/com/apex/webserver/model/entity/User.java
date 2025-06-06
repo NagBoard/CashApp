@@ -15,21 +15,17 @@ import java.util.UUID;
                 @Index(name = "idx_users_email", columnList = "email"),
         }
 )
-
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "public_id", nullable = false, updatable = false, unique = true)
-    private UUID publicId;
+    @Column(nullable = false, unique = true)
+    private String email;
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
-
-    @Column(nullable = false, unique = true)
-    private String email;
 
     private String phone;
 
@@ -48,6 +44,15 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "created_by", updatable = false)
+    private Long createdBy;
+
+    @Column(name = "updated_by")
+    private Long updatedBy;
+
+    @Column(name = "public_id", nullable = false, updatable = false, unique = true)
+    private UUID publicId;
+
     /**
     * JPA handles simple join tables automatically without need for separate entity, with a couple of annotations. It is marked @ManyToMany(mappedBy = "roles") in Role.java for it to work
     */
@@ -58,13 +63,16 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
 
-    // THIS is where we get the roles as a hashset, but actual fetching will happen in AuthService
+    // THIS is where we set the roles as a hashset, but actual fetching will happen in AuthService
     private Set<Role> roles = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (publicId == null) {
+            publicId = UUID.randomUUID();
+        }
     }
 
     @PreUpdate
