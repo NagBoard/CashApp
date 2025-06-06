@@ -5,14 +5,25 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(
+        name = "users",
+        indexes = {
+                @Index(name = "idx_users_public_id", columnList = "public_id"),
+                @Index(name = "idx_users_email", columnList = "email"),
+        }
+)
+
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "public_id", nullable = false, updatable = false, unique = true)
+    private UUID publicId;
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;

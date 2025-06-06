@@ -36,7 +36,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final UserDetailsService userDetailsService;
-    private final String TEMP_PASSWORD = ""
+    private final String TEMP_PASSWORD = "temp_password";
 
     @Value("${jwt.refresh-token.cookie-name}")
     private String refreshTokenCookieName;
@@ -104,6 +104,13 @@ public class AuthService {
         return new JwtResponseDto(accessToken, user, roles);
     }
 
+
+    /**
+     * Transactional method to register a new user, provides temp password and default role - USER
+     * @param registerRequest
+     * @param response
+     * @return
+     */
     @Transactional
     public JwtResponseDto registerUser(RegisterRequestDto registerRequest, HttpServletResponse response) {
 
@@ -115,7 +122,7 @@ public class AuthService {
         // Create new user
         User user = new User();
         user.setEmail(registerRequest.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
+        user.setPasswordHash(passwordEncoder.encode(TEMP_PASSWORD));
         user.setFirstName(registerRequest.getFirstName());
         user.setLastName(registerRequest.getLastName());
         user.setPhone(registerRequest.getPhone());
@@ -134,7 +141,7 @@ public class AuthService {
         // Authenticate and generate token
         LoginRequestDto loginRequest = new LoginRequestDto(
                 registerRequest.getEmail(),
-                registerRequest.getPassword()
+                TEMP_PASSWORD
         );
 
         return authenticateUser(loginRequest, response);
